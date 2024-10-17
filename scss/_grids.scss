@@ -20,13 +20,24 @@ $container-max-widths: (
 
 $grid-columns: 12;
 $grid-gutter-width: 30px; 
+$gutters: (
+  0: 0,
+  1: 0.25,
+  2: 0.5,
+  3: 1,
+  4: 1.5,
+  5: 3,
+);
 
 %gutter-padding {
-    padding-left: $grid-gutter-width * 0.5;
-    padding-right: $grid-gutter-width * 0.5;
+    padding-left: calc(var(--grid-gutter-x) * 0.5);
+    padding-right: calc(var(--grid-gutter-x) * 0.5);
 }
 
 .container-fluid {
+    --grid-gutter-x: #{$grid-gutter-width};
+    --grid-gutter-y: 0;
+
     width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -40,13 +51,18 @@ $grid-gutter-width: 30px;
 .row {
     display: flex;
     flex-wrap: wrap;
-    margin-left: -$grid-gutter-width * 0.5;
-    margin-right: -$grid-gutter-width * 0.5;
+    margin-top: calc(var(--grid-gutter-y) * -1);
+    margin-left: calc(var(--grid-gutter-x) * 0.5 * -1);
+    margin-right: calc(var(--grid-gutter-x) * 0.5 * -1);
 
     &[class*="row-cols-"] > *,
-    [class*=col-] {
+    [class*="col-"] {
         flex: 0 0 auto;
         @extend %gutter-padding
+    }
+
+    > * {
+            margin-top: var(--grid-gutter-y);
     }
 }
 
@@ -93,6 +109,21 @@ $grid-gutter-width: 30px;
      }
 }
 
+@mixin make-gutters ($infix) {
+    @each $i, $radio in $gutters {
+        .g#{$infix}-#{$i},
+        .gx#{$infix}-#{$i} {
+            --grid-gutter-x: #{$grid-gutter-width * $radio};
+        }
+
+        .g#{$infix}-#{$i},
+        .gy#{$infix}-#{$i} {
+            --grid-gutter-y: #{$grid-gutter-width * $radio};
+        }
+    }
+}
+
+
 @each $breakpoint, $dimension in $grid-breakpoints {
     $max-width: map-get($container-max-widths, $breakpoint);
 
@@ -105,13 +136,19 @@ $grid-gutter-width: 30px;
         max-width: $max-width;
     }
 
-@include make-media-query($infix);
+@include make-row-columns($infix);
 
 @include make-columns($infix);
 
 @include make-offsets($infix);
+
+@include make-gutters($infix);
   }
 }
 
 // row-cols-*, offset-*, g-*, gx-*, gy-*
+
+// gx : Khoảng cách giữa các cột 
+// gy : Khoảng cách giữa các hàng
+
 
