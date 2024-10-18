@@ -1,3 +1,5 @@
 @use "./reset";
-@use "./grids";
+@use "./grids" with (
+    $grid-gutter-width: 10px,
+) ;
 
